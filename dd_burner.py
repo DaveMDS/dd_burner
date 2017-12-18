@@ -55,16 +55,25 @@ class BlockDevice(object):
         if not S_ISBLK(mode):
             raise RuntimeError('"%s" is not a valid block device' % device)
 
-        self.device = device
-
-    def show_info(self):
-        print('Show device: %s' % self.device)
-        shell_exec('Udev Info', 'udevadm info -n %s' % self.device)
-        shell_exec('Partitions', 'sudo fdisk -l %s' % self.device)
+        self._device = device
 
     @property
+    def device_path(self):
+        return self._device
+    
+    @property
     def readable(self):
-        return os.access(self.device, os.R_OK)
+        return os.access(self._device, os.R_OK)
+
+    @property
+    def writeable(self):
+        return os.access(self._device, os.W_OK)
+
+    def show_info(self):
+        print('Show device: %s' % self._device)
+        shell_exec('Udev Info', 'udevadm info -n %s' % self._device)
+        shell_exec('Partitions', 'sudo fdisk -l %s' % self._device)
+
     
 
 
@@ -85,21 +94,37 @@ class ImageFile(object):
             and return  # is a real image file? (maybe support more types here)
         """
         
-        self.fname = fname
+        self._fname = fname
 
     def show_info(self):
-        print('Show image: %s  (fdisk-l)' % self.fname)
+        print('Show image: %s  (fdisk-l)' % self._fname)
         if self.fname.endswith(('gz', 'GZ', 'zip', 'ZIP')):
             raise NotImplemented('Cannot show a zipped image')
         else:
-            shell_exec('Partitions', 'fdisk -l %s' % self.fname)
+            shell_exec('Partitions', 'fdisk -l %s' % self._fname)
 
     @property
+    def file_path(self):
+        return self._fname
+    
+    @property
     def readable(self):
-        return os.access(self.fname, os.R_OK)
+        return os.access(self._fname, os.R_OK)
+
+    @property
+    def writable(self):
+        return os.access(self._fname, os.W_OK)
+
+    @property
+    def zipped(self):
+        return self._fname.endswith(('.gz', '.GZ'))
+
+    @property
+    def gzipped(self):
+        return self._fname.endswith(('.zip', '.ZIP'))
 
     def mount(self, mount_point):
-        print('Mounting image:  %s' % self.fname)
+        print('Mounting image:  %s' % self._fname)
         print('Mount point:     %s' % mount_point)
 
         if not os.path.isdir(mount_point) or os.listdir(mount_point):
@@ -116,7 +141,7 @@ class ImageFile(object):
         print('Loopback device: %s' % loop_device)
 
         ret = shell_exec('Loopback Setup',
-                         'sudo losetup -P %s %s' % (loop_device, self.fname))
+                         'sudo losetup -P %s %s' % (loop_device, self._fname))
 
         for f in glob.glob(loop_device + 'p*'):
             part_name = f[len(loop_device):]

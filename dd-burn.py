@@ -20,46 +20,35 @@
 
 from __future__ import absolute_import, print_function, division
 
-import os
-import sys
+
+import argparse
 from dd_burner import shell_exec, BlockDevice, ImageFile
 
 
-def usage():
-    print('Usage:  dd-burn ImageFile DeviceToBurn')
-
-def die(msg, ret=1, print_usage=True):
-    print(msg)
-    if print_usage:
-        usage()
-    exit(ret)
+parser = argparse.ArgumentParser(description='Write image file to device')
+parser.add_argument('srcimg',
+                    help='The image file to read data from')
+parser.add_argument('dstdev',
+                    help='The destination block device to write data into')
+args = parser.parse_args()
 
 
-# check and get args
-if len(sys.argv) != 3:
-    die('Invalid arguments')
-srcimg, dstdev = sys.argv[1:3]
-print('From image: %s\nTo device:    %s\n' % (srcimg, dstdev))
+# check source image and destination image
+img = ImageFile(args.srcimg)
+dev = BlockDevice(args.dstdev)
 
-
-# check source image
-img = ImageFile(srcimg)
-
-
-# check destination device
-dev = BlockDevice(dstdev)
-
-
-## Burn (zipped, gzipped or plain)
-print('ARE YOU REALLY SURE? Type your sudo password to confirm.')
-if srcimg.endswith(('.gz', '.GZ')):
-    cmd = 'pv %s | gunzip | dd of=%s bs=4M' % (srcimg, dstdev)
-elif srcimg.endswith(('.zip', '.ZIP')):
-    cmd = 'pv %s | funzip | dd of=%s bs=4M' % (srcimg, dstdev)
+# zipped, gzipped or plain image
+if img.gzipped:
+    cmd = 'pv %s | gunzip | dd of=%s bs=4M' % (img.file_path, dev.device_path)
+elif img.zipped:
+    cmd = 'pv %s | funzip | dd of=%s bs=4M' % (img.file_path, dev.device_path)
 else:
-    cmd = 'pv %s | dd of=%s bs=4M' % (srcimg, dstdev)
+    cmd = 'pv %s | dd of=%s bs=4M' % (img.file_path, dev.device_path)
+
+## Burn (with sudo)
+print('From image: %s\nTo device:  %s\n' % (img.file_path, dev.device_path))
+print('ARE YOU REALLY SURE? Type your sudo password to confirm.')
 shell_exec('Burn', 'sudo -k sh -c "%s"' % cmd)
 shell_exec('Sync', 'sync; sync;')
-
 
 exit(0)
