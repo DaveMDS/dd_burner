@@ -20,43 +20,35 @@
 
 from __future__ import absolute_import, print_function, division
 
+
 import os
-import sys
-from dd_burner import shell_exec, BlockDevice, ImageFile
+import argparse
+from dd_burner import shell_exec, BlockDevice
 
 
-def usage():
-    print('Usage:  dd-clone DeviceToRead ImageFile')
-
-def die(msg, ret=1, print_usage=True):
-    print(msg)
-    if print_usage:
-        usage()
-    exit(ret)
-
-
-# check and get args
-if len(sys.argv) != 3:
-    die('Invalid arguments')
-srcdev, dstimg = sys.argv[1:3]
-print('From device: %s\nTo image:    %s\n' % (srcdev, dstimg))
+parser = argparse.ArgumentParser(description='Save a device into an image file')
+parser.add_argument('srcdev',
+                    help='The device to read from')
+parser.add_argument('dstimg',
+                    help='The name of the image file to be created')
+args = parser.parse_args()
 
 
 # check source device
-dev = BlockDevice(srcdev)
-
+dev = BlockDevice(args.srcdev)
 
 # check destination image
-if os.path.exists(dstimg):
-    die('Destination already exists, not going to overwrite your file!',
-         print_usage=False)
+if os.path.exists(args.dstimg):
+    print('Destination already exists, not going to overwrite your file!')
+    exit(1)
 
-## Clone (gzipped or not)
-if dstimg.endswith(('.gz', '.GZ')):
-    cmd = 'sudo -k sh -c "pv %s | gzip | dd of=%s bs=4M"' % (srcdev, dstimg)
+# gzipped or not command
+if args.dstimg.endswith(('.gz', '.GZ')):
+    cmd = 'pv %s | gzip | dd of=%s bs=4M' % (args.srcdev, args.dstimg)
 else:
-    cmd = 'sudo -k sh -c "pv %s | dd of=%s bs=4M"' % (srcdev, dstimg)
-shell_exec('Clone', cmd)
+    cmd = 'pv %s | dd of=%s bs=4M' % (args.srcdev, args.dstimg)
 
-
+## Clone (with sudo)
+print('From device: %s\nTo image:    %s\n' % (args.srcdev, args.dstimg))
+shell_exec('Clone', 'sudo -k sh -c "%s"' % cmd)
 exit(0)
