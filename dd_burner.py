@@ -141,7 +141,7 @@ class ImageFile(object):
         print('Loopback device: %s' % loop_device)
 
         ret = shell_exec('Loopback Setup',
-                         'sudo losetup -P %s %s' % (loop_device, self._fname))
+                         'sudo losetup -P "%s" "%s"' % (loop_device, self._fname))
 
         for f in glob.glob(loop_device + 'p*'):
             part_name = f[len(loop_device):]
