@@ -98,7 +98,7 @@ class ImageFile(object):
 
     def show_info(self):
         print('Show image: %s  (fdisk-l)' % self._fname)
-        if self.fname.endswith(('gz', 'GZ', 'zip', 'ZIP')):
+        if self.zipped or self.gzipped:
             raise NotImplemented('Cannot show a zipped image')
         else:
             shell_exec('Partitions', 'fdisk -l %s' % self._fname)
@@ -116,16 +116,19 @@ class ImageFile(object):
         return os.access(self._fname, os.W_OK)
 
     @property
-    def zipped(self):
+    def gzipped(self):
         return self._fname.endswith(('.gz', '.GZ'))
 
     @property
-    def gzipped(self):
+    def zipped(self):
         return self._fname.endswith(('.zip', '.ZIP'))
 
     def mount(self, mount_point):
         print('Mounting image:  %s' % self._fname)
         print('Mount point:     %s' % mount_point)
+
+        if self.zipped or self.gzipped:
+            raise NotImplemented('Cannot mount a zipped image')
 
         if not os.path.isdir(mount_point) or os.listdir(mount_point):
             print('Mount point is not an empty directory')
@@ -135,7 +138,7 @@ class ImageFile(object):
 
         loop_device = shell_output(('losetup', '--find'))
         if loop_device is None:
-            print('Cannot find an unused loop device')
+            print('Cannot find an available loop device')
             return False
         loop_device = loop_device.strip('\n')
         print('Loopback device: %s' % loop_device)
@@ -151,5 +154,5 @@ class ImageFile(object):
                        'sudo mount "%s" "%s"' % (f, pmount_point))
 
     def umount(self):
-        pass
+        raise NotImplemented('TODO') # TODO !!!!!!!!!!!!
 
