@@ -23,7 +23,7 @@ from __future__ import absolute_import, print_function, division
 
 import os
 import argparse
-from dd_burner import shell_exec, BlockDevice
+from dd_burner import shell_exec, BlockDevice, ExecutionTimer
 
 
 parser = argparse.ArgumentParser(description='Save a device into an image file')
@@ -50,5 +50,8 @@ else:
 
 ## Clone (with sudo)
 print('From device: %s\nTo image:    %s\n' % (args.srcdev, args.dstimg))
+t = ExecutionTimer()
 shell_exec('Clone', 'sudo -k sh -c "%s"' % cmd)
+print('Operation completed in %s (include password prompt)' % t.readable)
+
 exit(0)

@@ -20,9 +20,8 @@
 
 from __future__ import absolute_import, print_function, division
 
-
 import argparse
-from dd_burner import shell_exec, BlockDevice, ImageFile
+from dd_burner import shell_exec, BlockDevice, ImageFile, ExecutionTimer
 
 
 parser = argparse.ArgumentParser(description='Write image file to device')
@@ -48,7 +47,10 @@ else:
 ## Burn (with sudo)
 print('From image: %s\nTo device:  %s\n' % (img.file_path, dev.device_path))
 print('ARE YOU REALLY SURE? Type your sudo password to confirm.')
+
+t = ExecutionTimer()
 shell_exec('Burn', 'sudo -k sh -c "%s"' % cmd)
 shell_exec('Sync', 'sync; sync;')
+print('Operation completed in %s (include password prompt)' % t.readable)
 
 exit(0)

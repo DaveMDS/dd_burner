@@ -22,6 +22,7 @@ from __future__ import absolute_import, print_function, division
 
 import os
 import sys
+import time
 import glob
 import subprocess
 from stat import S_ISBLK, S_ISREG
@@ -36,12 +37,28 @@ def shell_exec(title, command):
     print('\n====  %s (%s)  ===============' % (title, command))
     return os.system(command)
 
+
 def shell_output(args):
     try:
         out = subprocess.check_output(args)
         return out.decode('utf-8')
     except subprocess.CalledProcessError:
         return None
+
+
+class ExecutionTimer(object):
+    def __init__(self):
+        self._start_time = time.time()
+
+    @property
+    def elapsed(self):
+        return time.time() - self._start_time
+
+    @property
+    def readable(self):
+        el = self.elapsed
+        return '%d minutes and %d seconds' % (el / 60, el % 60)
+        
 
 
 class BlockDevice(object):
@@ -73,8 +90,6 @@ class BlockDevice(object):
         print('Show device: %s' % self._device)
         shell_exec('Udev Info', 'udevadm info -n %s' % self._device)
         shell_exec('Partitions', 'sudo fdisk -l %s' % self._device)
-
-    
 
 
 class ImageFile(object):
@@ -117,11 +132,11 @@ class ImageFile(object):
 
     @property
     def gzipped(self):
-        return self._fname.endswith(('.gz', '.GZ'))
+        return self._fname.lower().endswith('.gz')
 
     @property
     def zipped(self):
-        return self._fname.endswith(('.zip', '.ZIP'))
+        return self._fname.lower().endswith('.zip')
 
     def mount(self, mount_point):
         print('Mounting image:  %s' % self._fname)
