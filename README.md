@@ -3,8 +3,7 @@ A simple dd frontend to easily clone, burn, mount and manage image files
 
 Installation
 ------------
-For the moment just copy (or link) the five python files somewhere in your path,
-a proper setup.py script will come soon.
+Just copy (or link) the five python files somewhere in your path.
 
 dd-mount
 --------
