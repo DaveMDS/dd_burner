@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-# Copyright (C) 2017-2018 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2017-2024 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of dd-burner.
 #
@@ -20,7 +20,6 @@
 
 from __future__ import absolute_import, print_function, division
 
-import os
 import sys
 from dd_burner import shell_exec, BlockDevice, ImageFile
 
@@ -28,17 +27,20 @@ from dd_burner import shell_exec, BlockDevice, ImageFile
 def usage():
     print('Usage:  dd-show ImageFile OR dd-show Device')
 
+
 def die(msg, ret=1):
     print(msg)
     usage()
     exit(ret)
 
-### no params mode (fdisk -l)
+
+# no params mode (fdisk -l)
 if len(sys.argv) == 1:
     print('Show all available block devices')
     shell_exec('Devices', 'sudo fdisk -l')
 
-### single param mode: image file or block device
+
+# single param mode: image file or block device
 elif len(sys.argv) == 2:
     arg = sys.argv[1]
 
@@ -58,9 +60,8 @@ elif len(sys.argv) == 2:
 
     die('ERROR: param must be a regular file or a block device')
 
-### wrong params
+# wrong params
 else:
     die('ERROR: Wrong params')
 
 exit(0)
-

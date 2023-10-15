@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-# Copyright (C) 2017-2018 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2017-2024 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of dd-burner.
 #
@@ -21,7 +21,6 @@
 from __future__ import absolute_import, print_function, division
 
 import os
-import sys
 import time
 import glob
 import subprocess
@@ -58,13 +57,10 @@ class ExecutionTimer(object):
     def readable(self):
         el = self.elapsed
         return '%d minutes and %d seconds' % (el / 60, el % 60)
-        
 
 
 class BlockDevice(object):
     def __init__(self, device):
-        """ Function doc """
-
         if not os.path.exists(device):
             raise RuntimeError('Cannot find device "%s"' % device)
 
@@ -94,8 +90,6 @@ class BlockDevice(object):
 
 class ImageFile(object):
     def __init__(self, fname):
-        """ Function doc """
-
         if not os.path.exists(fname):
             raise RuntimeError('Cannot find image "%s"' % fname)
 
@@ -158,8 +152,8 @@ class ImageFile(object):
         loop_device = loop_device.strip('\n')
         print('Loopback device: %s' % loop_device)
 
-        ret = shell_exec('Loopback Setup',
-                         'sudo losetup -P "%s" "%s"' % (loop_device, self._fname))
+        shell_exec('Loopback Setup',
+                   'sudo losetup -P "%s" "%s"' % (loop_device, self._fname))
 
         for f in glob.glob(loop_device + 'p*'):
             part_name = f[len(loop_device):]
@@ -169,5 +163,4 @@ class ImageFile(object):
                        'sudo mount "%s" "%s"' % (f, pmount_point))
 
     def umount(self):
-        raise NotImplemented('TODO') # TODO !!!!!!!!!!!!
-
+        raise NotImplemented('TODO')

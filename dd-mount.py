@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-# Copyright (C) 2017-2018 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2017-2024 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of dd-burner.
 #

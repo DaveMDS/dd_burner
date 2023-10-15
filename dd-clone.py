@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-# Copyright (C) 2017-2018 Davide Andreoli <dave@gurumeditation.it>
+# Copyright (C) 2017-2024 Davide Andreoli <dave@gurumeditation.it>
 #
 # This file is part of dd-burner.
 #
@@ -48,7 +48,7 @@ if args.dstimg.endswith(('.gz', '.GZ')):
 else:
     cmd = 'pv %s | dd of=%s bs=4M' % (args.srcdev, args.dstimg)
 
-## Clone (with sudo)
+# Clone (with sudo)
 print('From device: %s\nTo image:    %s\n' % (args.srcdev, args.dstimg))
 t = ExecutionTimer()
 shell_exec('Clone', 'sudo -k sh -c "%s"' % cmd)
