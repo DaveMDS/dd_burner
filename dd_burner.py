@@ -125,6 +125,10 @@ class ImageFile(object):
         return os.access(self._fname, os.W_OK)
 
     @property
+    def xzipped(self):
+        return self._fname.lower().endswith('.xz')
+
+    @property
     def gzipped(self):
         return self._fname.lower().endswith('.gz')
 

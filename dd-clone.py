@@ -45,6 +45,8 @@ if os.path.exists(args.dstimg):
 # gzipped or not command
 if args.dstimg.endswith(('.gz', '.GZ')):
     cmd = 'pv %s | gzip | dd of=%s bs=4M' % (args.srcdev, args.dstimg)
+elif args.dstimg.endswith(('.xz', '.XZ')):
+    cmd = 'pv %s | xz | dd of=%s bs=4M' % (args.srcdev, args.dstimg)
 else:
     cmd = 'pv %s | dd of=%s bs=4M' % (args.srcdev, args.dstimg)
 

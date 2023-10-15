@@ -39,6 +39,8 @@ dev = BlockDevice(args.dstdev)
 # zipped, gzipped or plain image
 if img.gzipped:
     cmd = 'pv %s | gunzip | dd of=%s bs=4M' % (img.file_path, dev.device_path)
+elif img.xzipped:
+    cmd = 'pv %s | xz -d | dd of=%s bs=4M' % (img.file_path, dev.device_path)
 elif img.zipped:
     cmd = 'pv %s | funzip | dd of=%s bs=4M' % (img.file_path, dev.device_path)
 else:
